@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const jwt = require("jsonwebtoken");
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const { query } = require('express');
 const app = express();
 const port = process.env.PORT || 5000;
@@ -60,6 +60,14 @@ async function run(){
         sellerEmail: email
       };
       const result = await booksCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    // delete book by id
+    app.delete('/books/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id)};
+      const result = await booksCollection.deleteOne(query);
       res.send(result);
     })
 
