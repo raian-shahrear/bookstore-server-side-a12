@@ -66,8 +66,23 @@ async function run(){
     // delete book by id
     app.delete('/books/:id', async(req, res) => {
       const id = req.params.id;
-      const query = { _id: ObjectId(id)};
+      const query = { _id: ObjectId(id) };
       const result = await booksCollection.deleteOne(query);
+      res.send(result);
+    })
+
+    // update book's advertisement status
+    app.put('/books/:id', async(req, res) => {
+      const id = req.params.id;
+      const status = req.body.isAdvertised
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert:true };
+      const updateDoc = {
+        $set: {
+          isAdvertised:status
+        }
+      };
+      const result = await booksCollection.updateOne(filter, updateDoc, options);
       res.send(result);
     })
 
