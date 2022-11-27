@@ -21,6 +21,7 @@ async function run(){
   try{
     // MDB collections
     const categoriesCollection = client.db("book-store").collection("categories");
+    const booksCollection = client.db("book-store").collection("books");
 
 
     // get all categories
@@ -28,6 +29,14 @@ async function run(){
       const query = {};
       const categories = await categoriesCollection.find(query).toArray();
       res.send(categories);
+    })
+
+    // post/create book collection
+    app.post('/books', async(req, res) => {
+      const book = req.body;
+      console.log(book)
+      const result = await booksCollection.insertOne(book);
+      res.send(result);
     })
   }
   finally{}
