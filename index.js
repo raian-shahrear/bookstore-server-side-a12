@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const { query } = require('express');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -36,6 +37,20 @@ async function run(){
       const book = req.body;
       console.log(book)
       const result = await booksCollection.insertOne(book);
+      res.send(result);
+    })
+    
+    // get all book by category
+    app.get('/books', async(req, res)=> {
+      const category = req.query.name;
+      console.log(category);
+      let query = {};
+      if(category){
+        query = {
+          bookCategory: category
+        }
+      };
+      const result = await booksCollection.find(query).toArray();
       res.send(result);
     })
   }
