@@ -42,17 +42,40 @@ async function run(){
     
     // get all book by category
     app.get('/books', async(req, res)=> {
-      const category = req.query.name;
-      console.log(category);
+      const categoryId = req.query.id;
       let query = {};
-      if(category){
+      if(categoryId){
         query = {
-          bookCategory: category
+          categoryId: categoryId
         }
       };
       const result = await booksCollection.find(query).toArray();
       res.send(result);
     })
+
+    // get books by seller email
+    app.get('/books/:email', async(req, res) => {
+      const email = req.params.email;
+      const query = {
+        sellerEmail: email
+      };
+      const result = await booksCollection.find(query).toArray();
+      res.send(result);
+    })
+
+
+
+    // app.get('/books/email', async(req, res) => {
+    //   const filter = {};
+    //   const options = {upsert: true};
+    //   const updateDoc = {
+    //     $set: {
+    //       sellerEmail: "elon@gmail.com"
+    //     }
+    //   };
+    //   const result = await booksCollection.updateMany(filter, updateDoc, options)
+    //   res.send(result);
+    // })
   }
   finally{}
 }
