@@ -23,6 +23,7 @@ async function run(){
     // MDB collections
     const categoriesCollection = client.db("book-store").collection("categories");
     const booksCollection = client.db("book-store").collection("books");
+    const ordersCollection = client.db("book-store").collection("orders");
 
 
     // get all categories
@@ -35,7 +36,6 @@ async function run(){
     // post/create book collection
     app.post('/books', async(req, res) => {
       const book = req.body;
-      console.log(book)
       const result = await booksCollection.insertOne(book);
       res.send(result);
     })
@@ -63,11 +63,12 @@ async function run(){
       res.send(result);
     })
 
-    // delete book by id
-    app.delete('/books/:id', async(req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await booksCollection.deleteOne(query);
+    // get book by advertisement status:true
+    app.get('/books-isAdvertised', async(req, res)=> {
+      const query = {
+        isAdvertised: true
+      };
+      const result = await booksCollection.find(query).toArray();
       res.send(result);
     })
 
@@ -83,6 +84,21 @@ async function run(){
         }
       };
       const result = await booksCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    })
+
+    // delete book by id
+    app.delete('/books/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await booksCollection.deleteOne(query);
+      res.send(result);
+    })
+
+    // post/create order collection
+    app.post('/orders', async(req, res) => {
+      const order = req.body;
+      const result = await ordersCollection.insertOne(order);
       res.send(result);
     })
 
