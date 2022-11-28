@@ -112,6 +112,14 @@ async function run(){
       res.send(orders);
     })
 
+    // get order by id
+    app.get('/orders-to-payment/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id)};
+      const result = await ordersCollection.findOne(query);
+      res.send(result);
+    })
+
     // delete order by id
     app.delete('/orders/:id', async(req, res) => {
       const id = req.params.id;
