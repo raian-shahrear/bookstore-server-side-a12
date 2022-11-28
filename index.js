@@ -73,7 +73,7 @@ async function run(){
     })
 
     // update book's advertisement status
-    app.put('/books/:id', async(req, res) => {
+    app.put('/books-isAdvertised/:id', async(req, res) => {
       const id = req.params.id;
       const status = req.body.isAdvertised
       const filter = { _id: ObjectId(id) };
@@ -84,6 +84,38 @@ async function run(){
         }
       };
       const result = await booksCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    })
+
+    // update book status to report
+    app.put('/books-isReported/:id', async(req, res) => {
+      const id = req.params.id;
+      const status = req.body.isReported
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert:true };
+      const updateDoc = {
+        $set: {
+          isReported:status
+        }
+      };
+      const result = await booksCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    })
+
+    // get book by reported status:true
+    app.get('/books-isReported', async(req, res)=> {
+      const query = {
+        isReported: true
+      };
+      const result = await booksCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    // delete reported product by id
+    app.delete('/books-isReported/:id', async(req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id)};
+      const result = await booksCollection.deleteOne(filter);
       res.send(result);
     })
 
@@ -117,21 +149,6 @@ async function run(){
       const id = req.params.id;
       const query = { _id: ObjectId(id)};
       const result = await ordersCollection.findOne(query);
-      res.send(result);
-    })
-
-    // update order to report
-    app.put('/orders/:id', async(req, res) => {
-      const id = req.params.id;
-      const status = req.body.isReported
-      const filter = { _id: ObjectId(id) };
-      const options = { upsert:true };
-      const updateDoc = {
-        $set: {
-          isReported:status
-        }
-      };
-      const result = await ordersCollection.updateOne(filter, updateDoc, options);
       res.send(result);
     })
 
