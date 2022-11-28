@@ -120,6 +120,21 @@ async function run(){
       res.send(result);
     })
 
+    // update order to report
+    app.put('/orders/:id', async(req, res) => {
+      const id = req.params.id;
+      const status = req.body.isReported
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert:true };
+      const updateDoc = {
+        $set: {
+          isReported:status
+        }
+      };
+      const result = await ordersCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    })
+
     // delete order by id
     app.delete('/orders/:id', async(req, res) => {
       const id = req.params.id;
