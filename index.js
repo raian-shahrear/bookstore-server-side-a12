@@ -59,7 +59,7 @@ async function run(){
       next();
     };
 
-    // Create admin middleware
+    // Create seller middleware
     const verifySeller = async (req, res, next) => {
       // check admin
       const decodedEmail = req.decoded.email;
@@ -73,9 +73,8 @@ async function run(){
       next();
     };
 
-
     // get all categories
-    app.get('/categories', verifyJWT, async(req, res) => {
+    app.get('/categories', async(req, res) => {
       const query = {};
       const categories = await categoriesCollection.find(query).toArray();
       res.send(categories);
@@ -112,7 +111,7 @@ async function run(){
     })
 
     // get book by advertisement status:true
-    app.get('/books-isAdvertised', verifyJWT, async(req, res)=> {
+    app.get('/books-isAdvertised', async(req, res)=> {
       const query = {
         isAdvertised: true
       };
