@@ -88,7 +88,7 @@ async function run(){
     })
     
     // get all books by category
-    app.get('/books', verifyJWT, async(req, res)=> {
+    app.get('/books', async(req, res)=> {
       const categoryId = req.query.id;
       let query = {};
       if(categoryId){
