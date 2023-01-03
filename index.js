@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const stripe = require("stripe")(`${process.env.STRIPE_SK}`);
 const app = express();
@@ -29,6 +30,42 @@ function verifyJWT(req, res, next) {
     }
     req.decoded = decoded;
     next();
+  });
+}
+
+// Nodemailer: send email for payment confirmation
+function paymentConfirmationEmail(payment){
+  const {bookName, bookPrice, buyerName, buyerEmail, transactionId, paymentDate} = payment;
+  let transporter = nodemailer.createTransport({
+    host: 'smtp.sendgrid.net',
+    port: 587,
+    auth: {
+        user: "apikey",
+        pass: process.env.SENDGRID_API_KEY
+    }
+ })
+
+ transporter.sendMail({
+  from: "raianshahrearbd@gmail.com", // verified sender email
+  to: buyerEmail, // recipient email
+  subject: `BookStore: Payment for "${bookName}" has been successful`, // Subject line
+  text: ``, // plain text body
+  html: `
+    <h3>Hello! ${buyerName}</h3>
+    <h5>$${bookPrice} has been charged for "${bookName}"</h5>
+    <div>
+      <p>Purchase at ${paymentDate.split(", ")[2]} on ${paymentDate.split(", ")[0]}, ${paymentDate.split(", ")[1]}</p>
+      <p>Transaction Id is <b>${transactionId}</b></p>
+      <p style="margin: 10px 0 4px 0;">&#128578; Thanks from <b style="color: #0B61A3;">BookStore</b></p>
+      <p><small>For purchase more book, please visit <a href="https://bookstore-65836.web.app/" target="_blank">www.bookstore-65836.web.app</a></small></p>
+    </div>
+  `, // html body
+  }, function(error, info){
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
   });
 }
 
@@ -212,7 +249,6 @@ async function run(){
     // create users database
     app.post("/users", async (req, res) => {
       const user = req.body.registeredUser;
-      console.log(user)
       const query = {
         userEmail: user.userEmail,
       };
@@ -341,7 +377,8 @@ async function run(){
         }
       };
       const updateBook = await booksCollection.updateOne(queryBook, updateBookDoc, options);
-
+      // payment confirmation email
+      paymentConfirmationEmail(payment);
       res.send(result);
     });
 
